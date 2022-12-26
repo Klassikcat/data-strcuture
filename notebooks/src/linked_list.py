@@ -20,33 +20,51 @@ class Node(object):
 
 
 class LinkedList(object):
-    def __init__(self):
+    def __init__(self, items: Optional[List[Any]] = None):
         self.tail = Node(is_tail=True)
         self.head = Node(is_head=True, next=self.tail)
-        self.length = 2
+        self.length = 0
+        if items:
+            for idx, item in enumerate(items):
+                self.append(item, idx)
 
     def remove(self, idx: int):
-        prev_node = self[idx-1]
-        next_node = self[idx+1]
+        prev_node = self.get_pointer(idx-1)
+        next_node = self.get_pointer(idx+1)
         prev_node.next = next_node
         self.length -= 1
 
     def append(self, item: Any, idx: int):
         node_new = Node(item)
-        prev_node = self[idx-1]
+        prev_node = self.get_pointer(idx-1)
         next_node = prev_node.next
         prev_node.next = node_new
         node_new.set_next(next_node)
         self.length += 1
 
+    def __setitem__(self, idx, value):
+        self.get_pointer(idx).item = value
+
     def __len__(self):
         return self.length
 
-    def __getitem__(self, idx):
+    def get_pointer(self, idx: int):
         current_node = self.head
         for idx in range(idx + 1):
             current_node = current_node.next
         return current_node
+
+    def __getitem__(self, idx: int):
+        return self.get_pointer(idx).item
+
+    def __str__(self):
+        return str([self.__getitem__(idx) for idx in range(self.length)])
+
+    def __iter__(self):
+        current = self.head.next
+        while current.is_tail is False:
+            yield current.item
+            current = current.next
 
 
 def __main__():
